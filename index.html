@@ -64,7 +64,9 @@ body {
     content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(to bottom, rgba(15,15,15,0.85), rgba(15,15,15,1));
+    background: 
+        linear-gradient(to bottom, rgba(15,15,15,0.6), rgba(15,15,15,1)),
+        radial-gradient(circle at center, rgba(255,255,255,0.05), transparent 70%);
     z-index: 1;
 }
 
@@ -101,6 +103,15 @@ input[type="file"] {
     color: #b5b5b5;
 }
 
+.database-section h3::after {
+    content: "";
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: #444;
+    margin-top: 0.5rem;
+}
+
 .record {
     padding: 1rem 0;
     border-bottom: 1px solid #222;
@@ -113,15 +124,130 @@ input[type="file"] {
 
 .record-title {
     font-weight: 500;
-    font-size: 1.1rem;
+    font-size: 1.15rem;
 }
 
-.record-meta {
-    font-size: 0.85rem;
-    color: #777;
+.record-meta em {
+    display: block;
+    margin-top: 0.5rem;
+    color: #aaa;
+    font-style: normal;
+    border-left: 2px solid #333;
+    padding-left: 0.75rem;
 }
 
 </style>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+    async function initializeMap() {
+    const response = await fetch('mapdata.json');
+    const rawData = await response.json();
+
+    const data = rawData["Map Data"]; 
+    // Necessary to unpack data because data is an object on the outermost layer rather than an array
+    // Might fix later but is functional for now
+
+    console.log("Full data:", data);
+
+    const map = L.map('map').setView([20, 0], 2);
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(map);
+    // Using OpenStreetMap now instead of Google Maps API using Leaflet
+    // Consult OpenStreetMap wiki and YouTube, will collect resources later
+    // https://wiki.openstreetmap.org/
+    // https://leafletjs.com/
+
+    data.forEach(item => {
+        console.log(item);
+        if (!item.Latitude || !item.Longitude) {
+            console.log("SKIPPED:", item);
+            return;
+        }
+        // Runs through data + checks if each individual place has a Latitude/Longitude value
+        // (otherwise we can't plot it as a marker)
+
+        const lat = parseFloat(item.Latitude);
+        const lng = parseFloat(item.Longitude);
+
+        console.log("Lat/Lng:", lat, lng);
+        // All of these are displayed in the inspect console on Google Chrome, if
+        // you so desire to debug that way. I found it helpful
+
+        const marker = L.marker([lat, lng]).addTo(map);
+        // Self explanatory
+
+        marker.bindPopup(`
+            <div style="color:black">
+                <strong>${item.Name}</strong><br>
+                ${item.Type} - ${item.Subtype}<br>
+                ${item["Current Country"]}
+            </div>
+            `);
+        });
+    }
+    window.onload = initializeMap;
+    </script>
+
+<script>
+    async function loadPeople() {
+        const response = await fetch('peopledata.json');
+        const rawData = await response.json();
+    
+        const people = rawData["People"];
+        const container = document.getElementById("people-container");
+        
+        // Overall pretty similar experience just working with .json information
+
+        people.forEach(person => {
+            const record = document.createElement("div");
+            record.className = "record";
+    
+            let summary = "";
+    
+            for (let i = 1; i <= 5; i++) { // 5 is hard set placeholder value for now
+                if (person[`Location ${i}`]) {
+                    summary += `
+                        ${person[`Location ${i}`].trim()}
+                        (${person[`Time Period ${i}`] || "No date"})
+                        <br>
+                    `;
+                    // Gets rid of excess spaces + adds date if there is one (otherwise no date obv)
+                }
+            }
+            const title = document.createElement("div");
+            title.className = "record-title";
+            title.textContent = person.Name;
+    
+            const meta = document.createElement("div");
+            meta.className = "record-meta";
+            meta.innerHTML = summary;
+    
+            const extra = document.createElement("div");
+            extra.className = "record-meta";
+            extra.style.display = "none";
+            extra.style.marginTop = "0.5rem";
+            extra.innerHTML = `
+                <em>${person["Personal Information"] || "No additional info"}</em>
+            `;
+            record.addEventListener("click", () => {
+                extra.style.display = extra.style.display === "none" ? "block" : "none";
+            });
+            // So we see the extra information for each record on click
+
+            record.appendChild(title);
+            record.appendChild(meta);
+            record.appendChild(extra);
+            container.appendChild(record);
+        });
+    }
+    loadPeople();
+</script>
+
 </head>
 <body>
 
@@ -137,16 +263,15 @@ input[type="file"] {
 </section>
 
 <section class="database-section">
+    <h3>Map View</h3>
+    <div id="map" style="height: 500px; width: 100%;"></div>
+</section>
+
+<section class="database-section">
     <h3>People & Place Records</h3>
+    <div id="people-container">
 
-    <div class="record">
-        <div class="record-title">Example Place</div>
-        <div class="record-meta">Country - State - Activities</div>
-    </div>
 
-    <div class="record">
-        <div class="record-title">Example Person</div>
-        <div class="record-meta">Status - Locations - Dates - Activities</div>
     </div>
 </section>
 
