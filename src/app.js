@@ -1,5 +1,8 @@
+src="https://unpkg.com/leaflet/dist/leaflet.js"
+src="https://unpkg.com/leaflet.markercluster/dist/leaflet.markercluster.js"
+
 async function initializeMap() {
-    const response = await fetch('mapdata.json');
+    const response = await fetch('src/mapdata.json');
     const rawData = await response.json();
 
     const data = rawData["Map Data"]; 
@@ -8,7 +11,7 @@ async function initializeMap() {
 
     console.log("Full data:", data);
 
-    const map = L.map('map').setView([20, 0], 2);
+    const map = L.map('map').setView([50, 10], 4.25);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: '&copy; OpenStreetMap contributors'
@@ -18,26 +21,33 @@ async function initializeMap() {
     // https://wiki.openstreetmap.org/
     // https://leafletjs.com/
 
+    const markers = L.markerClusterGroup();
+    const countryCounts = {};
+
     data.forEach(item => {
         console.log(item);
         if (!item.Latitude || !item.Longitude) {
             console.log("SKIPPED:", item);
             return;
-    }
-    // Runs through data + checks if each individual place has a Latitude/Longitude value
-    // (otherwise we can't plot it as a marker)
+        }
+        // Runs through data + checks if each individual place has a Latitude/Longitude value
+        // (otherwise we can't plot it as a marker)
 
-    const lat = parseFloat(item.Latitude);
-    const lng = parseFloat(item.Longitude);
+        const lat = parseFloat(item.Latitude);
+        const lng = parseFloat(item.Longitude);
 
-    console.log("Lat/Lng:", lat, lng);
-    // All of these are displayed in the inspect console on Google Chrome, if
-    // you so desire to debug that way. I found it helpful
+        const country = item["Current Country"]; // Used for country clusters (notes country + how many the data has)
+        countryCounts[country] = (countryCounts[country] || 0) + 1;
 
-    const marker = L.marker([lat, lng]).addTo(map);
-    // Self explanatory
+        console.log("Lat/Lng:", lat, lng);
+        // All of these are displayed in the inspect console on Google Chrome, if
+        // you so desire to debug that way. I found it helpful
 
-    marker.bindPopup(`
+        const marker = L.marker([lat, lng]);
+        markers.addLayer(marker);
+        // Self explanatory
+
+        marker.bindPopup(`
         <div style="color:black">
             <strong>${item.Name}</strong><br>
             ${item.Type} - ${item.Subtype}<br>
@@ -45,9 +55,31 @@ async function initializeMap() {
         </div>
         `);
     });
+
+    map.addLayer(markers); // Add markers to map
+
+    for (const country in countryCounts) {
+        const count = countryCounts[country];
+        const latLng = getCountryCentroid(country);
+
+        // For loop iterating through the list of countries featured in the data
+        // Hypothetically, supposed to put clusters at the center of each country featured.
+        // The "getCountryCentroid" function stores the coordinates of the approximate center
+        // of each country.
+
+        const countryMarker = L.marker(latLng).bindPopup(`${country}: ${count} camps`);
+        markers.addLayer(countryMarker);
+    }
 }
 
-    if (typeof window !== "undefined") {
+function getCountryCentroid(country) {
+    const countryCentroids = {
+        
+    };
+    return countryCentroids[country] || [0, 0];
+}
+
+if (typeof window !== "undefined") {
     window.onload = initializeMap;
 }
 
@@ -103,4 +135,4 @@ async function loadPeople() {
         container.appendChild(record);
     });
 }
-module.exports = { loadPeople, initializeMap};
+// module.exports = { loadPeople, initializeMap};

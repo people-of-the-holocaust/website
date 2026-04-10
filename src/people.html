@@ -1,13 +1,25 @@
 <!DOCTYPE html>
-<html>
-    <nav>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="people.html">People of the Holocaust</a></li>
-          <li><a href="places.html">Places of the Holocaust</a></li>
-        </ul>
-      </nav>
-    <body>
-        
-    </body>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The People</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="src/app.js"></script>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="brand">MARQUETTE UNIVERSITY</div>
+        <div class="brand">BADER PHILANTHROPIES / USHMM</div>
+        <div class="navigation-buttons">
+            <button onclick="window.location.href='../index.html'">Home</button>
+            <button onclick="window.location.href='places.html'">The Places</button>
+        </div>
+    </div>
+    
+    <section class="database-section">
+        <h3>People Records</h3>
+        <div id="people-container"></div>
+    </section>
+</body>
 </html>
