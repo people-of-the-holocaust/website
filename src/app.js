@@ -135,4 +135,4 @@ async function loadPeople() {
         container.appendChild(record);
     });
 }
-// module.exports = { loadPeople, initializeMap};
+module.exports = { loadPeople, initializeMap};
