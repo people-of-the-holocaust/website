@@ -8,13 +8,11 @@ export default function Home() {
   return (
     <>
       <Navbar />
-      <section className="hero">
+      <section className="hero" style={{backgroundImage: `url(${heroImage})`}}>
         <div className="hero-content">
           <h1>PEOPLE OF THE HOLOCAUST</h1>
         </div>
       </section>
-
-      <section className="hero" style={{backgroundImage: `url(${heroImage})`}}> </section>
 
       <section className="database-section">
         <h3 className="section-title"> Why This Project?</h3>
