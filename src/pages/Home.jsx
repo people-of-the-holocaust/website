@@ -2,6 +2,7 @@
 // be changed in styles.css at some point
 import Navbar from "../components/Navbar";
 import MapView from "../components/MapView";
+import heroImage from "../assets/heroImage.jpg";
 
 export default function Home() {
   return (
@@ -12,6 +13,8 @@ export default function Home() {
           <h1>PEOPLE OF THE HOLOCAUST</h1>
         </div>
       </section>
+
+      <section className="hero" style={{backgroundImage: `url(${heroImage})`}}> </section>
 
       <section className="database-section">
         <h3 className="section-title"> Why This Project?</h3>
