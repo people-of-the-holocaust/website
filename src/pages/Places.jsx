@@ -20,8 +20,8 @@ export default function Places() {
 
   useEffect(() => {
     async function loadData() {
-        const placeData = await loadCSV("/data/place_table.csv");
-        const activityData = await loadCSV("/data/activity_table.csv");
+      const placeData = await loadCSV(`${import.meta.env.BASE_URL}data/place_table.csv`);
+      const activityData = await loadCSV(`${import.meta.env.BASE_URL}data/activity_table.csv`);
 
         setPlaces(placeData);
         setPlaceIndex(buildPlaceIndex(activityData));

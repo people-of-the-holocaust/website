@@ -15,7 +15,7 @@ export default function MapView() {
       attribution: "&copy; OpenStreetMap contributors",
     }).addTo(map); // OpenStreetMaps API
 
-    fetch("/data/mapdata.json") // Taking our mapdata.json from the data folder in public
+    fetch(`${import.meta.env.BASE_URL}data/mapdata.json`) // Taking our mapdata.json from the data folder in public
       .then(res => res.json())
       .then(rawData => {
         const data = rawData["Map Data"];

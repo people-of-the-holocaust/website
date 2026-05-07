@@ -24,8 +24,8 @@ export default function People() {
   useEffect(() => {
     async function loadData() {
       try {
-        const peopleData = await loadCSV("/data/people_table.csv");
-        const activityData = await loadCSV("/data/activity_table.csv");
+        const peopleData = await loadCSV(`${import.meta.env.BASE_URL}data/people_table.csv`);
+        const activityData = await loadCSV(`${import.meta.env.BASE_URL}data/activity_table.csv`);
 
         setPeople(peopleData);
         setActivityIndex(buildActivityIndex(activityData));
